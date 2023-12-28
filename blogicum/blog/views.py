@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.http import HttpResponseNotFound
+
 
 posts = [
     {
@@ -43,6 +45,8 @@ posts = [
     },
 ]
 
+posts_dict = {}
+
 
 def index(request):
     template = 'blog/index.html'
@@ -50,10 +54,16 @@ def index(request):
     return render(request, template, context)
 
 
-def post_detail(request, pk):
-    template = 'blog/detail.html'
-    context = {'blog': posts[pk], 'post': posts[pk]}
-    return render(request, template, context)
+def post_detail(request, post_pk):
+    for post in posts:
+        posts_dict[post['id']] = post
+    if post_pk in posts_dict:
+        post = posts_dict[post_pk]
+        template = 'blog/detail.html'
+        context = {'blog': post, 'post': post}
+        return render(request, template, context)
+    else:
+        return HttpResponseNotFound("Поста с таким идентификатором нет")
 
 
 def category_posts(request, category_slug):
